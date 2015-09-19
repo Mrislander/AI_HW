@@ -4,6 +4,7 @@
 #include <fstream>
 #include <algorithm>
 #include <vector>
+#pragma warning(disable:4996)
 
 using namespace std;
 typedef pair<int,int> state;
@@ -47,16 +48,18 @@ public:
 };
 
 vector<int> applicableRule(state s,int a,int b);
-state applyRuleS1(vector<int> rules);
+state applyRuleS1(vector<int> rules,int a,int b,state in);
+
 
 
 
 int main(int argc,char *argv[]){
 
 	if(argc!=3){
-	cout<<"\nUsage: "<<argv[0]<<" input\n"<<endl; 
+	cout<<"\nUsage: "<<argv[0]<<" inputfile outputfile\n"<<endl; 
 	}
 	ifstream infile(argv[1]);
+	freopen(argv[2],"w",stdout);
 	if(!infile.is_open()) cout<<"Could not open file\n"<<endl;
 	string line;
 	int CA,CB,found;
@@ -69,22 +72,41 @@ int main(int argc,char *argv[]){
 		pos++;
 		if(pos==1){CA=found;}
 		if(pos==2){CB=found;}
-		if(pos==3){initS.first=found;}
-		if(pos==4){initS.second=found;}
-		if(pos==5){golS.first=found;}
-		if(pos==6){golS.second=found;}
+		if(pos==3){initS.first=found>0?found:0;}
+		if(pos==4){initS.second=found>0?found:0;}
+		if(pos==5){golS.first=found>0?found:0;}
+		if(pos==6){golS.second=found>0?found:0;}
 	
       }
 	}
 
 	node head(initS);
-	vector<int> ans = applicableRule(initS,CA,CB);
-	cout<<"Strategy A"<<endl;
+	vector<int> roles;
+	cout<<"Strategy A initial state("<<initS.first<<","<<initS.second<<")"<<endl;
+	int count = 0;
+	state currentState = initS;
+	bool flag = false;
+	while(count<250){
+     roles = applicableRule(currentState,CA,CB);
+	 currentState = applyRuleS1(roles,CA,CB,currentState);
+	 if(currentState == golS){
+       flag = true;	 
+		 break;
+	 } 
+	 cout<<"step"<<count+1<<endl;
+	 count++;
+	  
+	}
+	if(!flag)
+	cout<<"Strategy A failed"<<endl;
+	else 
+    cout<<"Find Solution"<<endl;
+	cout<<endl<<endl<<endl;
+	cout<<"Strategy B initial state("<<initS.first<<","<<initS.second<<")"<<endl;
 
 
-
-
-
+infile.close();
+fclose (stdout);
 return 0;
 }
 
@@ -101,18 +123,52 @@ vector<int> applicableRule(state s,int a,int b){
 	if(s.first+s.second<=b && s.first>0)  ans.push_back(8);
 	return ans;
 }
-state applyRuleS1(vector<int> rules){
+state applyRuleS1(vector<int> rules,int a,int b,state in){
 	int key = 0;
+	int index = rand()%rules.size();
+	key = rules[index];
+	state out;
 	switch(key){
 	case 1:
-
+		out.first=a;
+		out.second=in.second;
+		cout<<"Fill the "<<a<<"-gallon jug->state("<<out.first<<","<<out.second<<")"<<endl;
+		break;
 	case 2:
-
+		out.first=in.first;
+		out.second=b;
+		cout<<"Fill the "<<b<<"-gallon jug->state("<<out.first<<","<<out.second<<")"<<endl;
+		break;
 	case 3:
+		out.first=0;
+		out.second=in.second;
+		cout<<"Empty the "<<a<<"-gallon jug->state("<<out.first<<","<<out.second<<")"<<endl;
+		break;
     case 4:
+		out.first=in.first;
+		out.second=0;
+		cout<<"Empty the "<<b<<"-gallon jug->state("<<out.first<<","<<out.second<<")"<<endl;
+		break;
 	case 5:
+		out.first = a;
+		out.second = in.second -(a-in.first);
+		cout<<"Pour water from "<<b<<"-gallon jug into "<<a<<"-gallon jug untill full ->state("<<out.first<<","<<out.second<<")"<<endl;
+		break;
 	case 6:
+		out.first = in.first-(b-in.second);
+		out.second = b;
+		cout<<"Pour water from "<<a<<"-gallon jug into "<<b<<"-gallon jug untill full ->state("<<out.first<<","<<out.second<<")"<<endl;
+		break;
     case 7:
+		out.first=in.first+in.second;
+		out.second=0;
+		cout<<"Pour all the water from "<<b<<"-gallon jug into "<<a<<"-gallon jug->state("<<out.first<<","<<out.second<<")"<<endl;
+		break;
     case 8:
+		out.first=0;
+		out.second=in.first+in.second;
+		cout<<"Pour all the water from "<<b<<"-gallon jug into "<<a<<"-gallon jug->state("<<out.first<<","<<out.second<<")"<<endl;
+		break;
 	}
+	return out;
 }
