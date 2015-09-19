@@ -29,27 +29,41 @@ class node{
 
 private:
 	state s;
-	vector<edge> *successor;
-    edge *predecessor;
+	vector<edge> *successor ;
+    node *predecessor;
+	int step;
 public:
 	node(pair<int,int> state){
 		s=state;
-		successor=NULL;
+		successor= new vector<edge>();
 		predecessor=NULL;
+		step = 0;
 	};
+	~node(){
+		delete [] this->successor;
+	}
 	void addedge(node *dest){
 	edge e ;
 	e.org = this;
 	e.dest = dest;
+	
 	this->successor->push_back(e);
-	dest->addedge(this); 
+	dest->setPredecessor(this);
 	}
-
+	void setPredecessor(node *p){
+		this->predecessor = p;
+	}
+	int getStep(){
+	return this->step;
+	}
+	void setStep(int x){
+		this->step = x;
+	}
 };
 
 vector<int> applicableRule(state s,int a,int b);
 state applyRuleS1(vector<int> rules,int a,int b,state in);
-
+vector<state> applyRuleS2(vector<int> rules,int a,int b,state in);
 
 
 
@@ -80,15 +94,14 @@ int main(int argc,char *argv[]){
       }
 	}
 
-	node head(initS);
-	vector<int> roles;
+	vector<int> rules;
 	cout<<"Strategy A initial state("<<initS.first<<","<<initS.second<<")"<<endl;
 	int count = 0;
 	state currentState = initS;
 	bool flag = false;
 	while(count<250){
-     roles = applicableRule(currentState,CA,CB);
-	 currentState = applyRuleS1(roles,CA,CB,currentState);
+     rules = applicableRule(currentState,CA,CB);
+	 currentState = applyRuleS1(rules,CA,CB,currentState);
 	 if(currentState == golS){
        flag = true;	 
 		 break;
@@ -102,7 +115,24 @@ int main(int argc,char *argv[]){
 	else 
     cout<<"Find Solution"<<endl;
 	cout<<endl<<endl<<endl;
+
 	cout<<"Strategy B initial state("<<initS.first<<","<<initS.second<<")"<<endl;
+	vector<node> existState;
+	vector<state> expendState;
+	node head(initS);
+	node curr(head);
+	existState.push_back(head);
+	currentState = initS;
+	while(true){
+		rules = applicableRule(currentState,CA,CB);
+		expendState = applyRuleS2(rules,CA,CB,currentState);
+		for(int i = 0 ; i<expendState.size();i++){
+			node *temp = new node(expendState[i]); 
+			curr.addedge(temp);
+		}
+		currentState = initS;
+	
+	}
 
 
 infile.close();
@@ -171,4 +201,57 @@ state applyRuleS1(vector<int> rules,int a,int b,state in){
 		break;
 	}
 	return out;
+}
+
+
+vector<state> applyRuleS2(vector<int> rules,int a,int b,state in){
+	    vector<state> res;
+		state out; 
+		int key = 0;
+		for(int i = 0;i<rules.size();i++){
+		key = rules[i];
+	    if(key==1){
+		out.first=a;
+		out.second=in.second;
+		//cout<<"Fill the "<<a<<"-gallon jug->state("<<out.first<<","<<out.second<<")"<<endl;
+		}
+	    else if(key==2){
+		out.first=in.first;
+		out.second=b;
+		//cout<<"Fill the "<<b<<"-gallon jug->state("<<out.first<<","<<out.second<<")"<<endl;
+		}
+	    else if(key==3){
+		out.first=0;
+		out.second=in.second;
+		//cout<<"Empty the "<<a<<"-gallon jug->state("<<out.first<<","<<out.second<<")"<<endl;
+		}
+		else if(key==4){
+		out.first=in.first;
+		out.second=0;
+		//cout<<"Empty the "<<b<<"-gallon jug->state("<<out.first<<","<<out.second<<")"<<endl;
+		}
+		else if(key==5){
+		out.first = a;
+		out.second = in.second -(a-in.first);
+		//cout<<"Pour water from "<<b<<"-gallon jug into "<<a<<"-gallon jug untill full ->state("<<out.first<<","<<out.second<<")"<<endl;
+		}
+		else if(key==6){
+		out.first = in.first-(b-in.second);
+		out.second = b;
+		//cout<<"Pour water from "<<a<<"-gallon jug into "<<b<<"-gallon jug untill full ->state("<<out.first<<","<<out.second<<")"<<endl;
+		}
+		else if(key==7){
+		out.first=in.first+in.second;
+		out.second=0;
+		//cout<<"Pour all the water from "<<b<<"-gallon jug into "<<a<<"-gallon jug->state("<<out.first<<","<<out.second<<")"<<endl;
+		}
+		else if(key==8){
+		out.first=0;
+		out.second=in.first+in.second;
+		//cout<<"Pour all the water from "<<b<<"-gallon jug into "<<a<<"-gallon jug->state("<<out.first<<","<<out.second<<")"<<endl;
+		}
+		res.push_back(out);
+	}
+		return res;
+
 }
