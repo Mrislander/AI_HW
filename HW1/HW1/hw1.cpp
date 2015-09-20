@@ -4,6 +4,7 @@
 #include <fstream>
 #include <algorithm>
 #include <vector>
+#include <queue>
 #pragma warning(disable:4996)
 
 using namespace std;
@@ -86,26 +87,47 @@ int main(int argc,char *argv[]){
 		pos++;
 		if(pos==1){CA=found;}
 		if(pos==2){CB=found;}
-		if(pos==3){initS.first=found>0?found:0;}
-		if(pos==4){initS.second=found>0?found:0;}
-		if(pos==5){golS.first=found>0?found:0;}
-		if(pos==6){golS.second=found>0?found:0;}
+		if(pos==3){initS.first=found;}
+		if(pos==4){initS.second=found;}
+		if(pos==5){golS.first=found;}
+		if(pos==6){golS.second=found;}
 	
       }
 	}
 
 	vector<int> rules;
 	cout<<"Strategy A initial state("<<initS.first<<","<<initS.second<<")"<<endl;
+	
 	int count = 0;
 	state currentState = initS;
+	
 	bool flag = false;
 	while(count<250){
      rules = applicableRule(currentState,CA,CB);
 	 currentState = applyRuleS1(rules,CA,CB,currentState);
-	 if(currentState == golS){
+	 if(golS.first<0&&golS.second>=0){
+		 if(currentState.second == golS.second){
        flag = true;	 
 		 break;
-	 } 
+	 }
+	 }
+	 else if(golS.second<0&&golS.first>=0){
+		 if(currentState.first == golS.first){
+       flag = true;	 
+		 break;
+	 }
+	 }
+	 else if (golS.second<0&&golS.first<0){
+       flag = true;	 
+		 break;
+	 }
+	 else{
+		if(currentState == golS)
+	   {
+		   flag = true;	 
+		break;
+		}
+	 }
 	 cout<<"step"<<count+1<<endl;
 	 count++;
 	  
@@ -119,6 +141,7 @@ int main(int argc,char *argv[]){
 	cout<<"Strategy B initial state("<<initS.first<<","<<initS.second<<")"<<endl;
 	vector<node> existState;
 	vector<state> expendState;
+	queue<node> discoverNode;
 	node head(initS);
 	node curr(head);
 	existState.push_back(head);
@@ -133,7 +156,7 @@ int main(int argc,char *argv[]){
 		currentState = initS;
 	
 	}
-
+	
 
 infile.close();
 fclose (stdout);
@@ -162,42 +185,42 @@ state applyRuleS1(vector<int> rules,int a,int b,state in){
 	case 1:
 		out.first=a;
 		out.second=in.second;
-		cout<<"Fill the "<<a<<"-gallon jug->state("<<out.first<<","<<out.second<<")"<<endl;
+		cout<<"Fill the "<<a<<"-gallon jug\t->state("<<out.first<<","<<out.second<<")"<<endl;
 		break;
 	case 2:
 		out.first=in.first;
 		out.second=b;
-		cout<<"Fill the "<<b<<"-gallon jug->state("<<out.first<<","<<out.second<<")"<<endl;
+		cout<<"Fill the "<<b<<"-gallon jug\t->state("<<out.first<<","<<out.second<<")"<<endl;
 		break;
 	case 3:
 		out.first=0;
 		out.second=in.second;
-		cout<<"Empty the "<<a<<"-gallon jug->state("<<out.first<<","<<out.second<<")"<<endl;
+		cout<<"Empty the "<<a<<"-gallon jug\t->state("<<out.first<<","<<out.second<<")"<<endl;
 		break;
     case 4:
 		out.first=in.first;
 		out.second=0;
-		cout<<"Empty the "<<b<<"-gallon jug->state("<<out.first<<","<<out.second<<")"<<endl;
+		cout<<"Empty the "<<b<<"-gallon jug\t->state("<<out.first<<","<<out.second<<")"<<endl;
 		break;
 	case 5:
 		out.first = a;
 		out.second = in.second -(a-in.first);
-		cout<<"Pour water from "<<b<<"-gallon jug into "<<a<<"-gallon jug untill full ->state("<<out.first<<","<<out.second<<")"<<endl;
+		cout<<"Pour water from "<<b<<"-gallon jug into "<<a<<"-gallon jug untill full \t->state("<<out.first<<","<<out.second<<")"<<endl;
 		break;
 	case 6:
 		out.first = in.first-(b-in.second);
 		out.second = b;
-		cout<<"Pour water from "<<a<<"-gallon jug into "<<b<<"-gallon jug untill full ->state("<<out.first<<","<<out.second<<")"<<endl;
+		cout<<"Pour water from "<<a<<"-gallon jug into "<<b<<"-gallon jug untill full \t->state("<<out.first<<","<<out.second<<")"<<endl;
 		break;
     case 7:
 		out.first=in.first+in.second;
 		out.second=0;
-		cout<<"Pour all the water from "<<b<<"-gallon jug into "<<a<<"-gallon jug->state("<<out.first<<","<<out.second<<")"<<endl;
+		cout<<"Pour all the water from "<<b<<"-gallon jug into "<<a<<"-gallon jug \t->state("<<out.first<<","<<out.second<<")"<<endl;
 		break;
     case 8:
 		out.first=0;
 		out.second=in.first+in.second;
-		cout<<"Pour all the water from "<<b<<"-gallon jug into "<<a<<"-gallon jug->state("<<out.first<<","<<out.second<<")"<<endl;
+		cout<<"Pour all the water from "<<b<<"-gallon jug into "<<a<<"-gallon jug \t->state("<<out.first<<","<<out.second<<")"<<endl;
 		break;
 	}
 	return out;
