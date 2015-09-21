@@ -34,6 +34,7 @@ private:
     node *predecessor;
 	int step;
 public:
+
 	node(pair<int,int> state){
 		s=state;
 		successor= new vector<edge>();
@@ -42,6 +43,9 @@ public:
 	};
 	~node(){
 		delete [] this->successor;
+	}
+	state getState(){
+	return this->s; 
 	}
 	void addedge(node *dest){
 	edge e ;
@@ -65,7 +69,7 @@ public:
 vector<int> applicableRule(state s,int a,int b);
 state applyRuleS1(vector<int> rules,int a,int b,state in);
 vector<state> applyRuleS2(vector<int> rules,int a,int b,state in);
-
+bool unique(state s,vector<node*> nodes);
 
 
 int main(int argc,char *argv[]){
@@ -139,27 +143,34 @@ int main(int argc,char *argv[]){
 	cout<<endl<<endl<<endl;
 
 	cout<<"Strategy B initial state("<<initS.first<<","<<initS.second<<")"<<endl;
-	vector<node> existState;
+	vector<node*> existState;
 	vector<state> expendState;
-	queue<node> discoverNode;
+	queue<node*> Nodes;
 	node head(initS);
-	node curr(head);
-	existState.push_back(head);
-	currentState = initS;
-	while(true){
-		rules = applicableRule(currentState,CA,CB);
-		expendState = applyRuleS2(rules,CA,CB,currentState);
-		for(int i = 0 ; i<expendState.size();i++){
-			node *temp = new node(expendState[i]); 
-			curr.addedge(temp);
-		}
-		currentState = initS;
+	node *curr;
+	Nodes.push(&head);
+	existState.push_back(&head);
 	
+	while(!Nodes.empty()){
+		curr = Nodes.front();
+		rules = applicableRule(curr->getState(),CA,CB);
+		expendState = applyRuleS2(rules,CA,CB,curr->getState());
+		Nodes.pop();
+		node *temp;
+		for(int i = 0;i<expendState.size();i++){
+			if(unique(expendState[i],existState)){
+			temp =new node(expendState[i]);
+			Nodes.push(temp);
+			existState.push_back(temp);
+			curr->addedge(temp);
+			}
+		}
 	}
 	
 
 infile.close();
 fclose (stdout);
+
 return 0;
 }
 
@@ -277,4 +288,12 @@ vector<state> applyRuleS2(vector<int> rules,int a,int b,state in){
 	}
 		return res;
 
+}
+
+bool unique(state s,vector<node*> nodes){
+	for(int i = 0; i<nodes.size();i++){
+		if(nodes[i]->getState() == s)
+	    return false;
+	}
+	return true;
 }
