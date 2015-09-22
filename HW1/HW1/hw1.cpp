@@ -18,6 +18,7 @@ private:
 	node *org;
 	node *dest;
 	
+	
 public:
 	edge(){
 	org=NULL;
@@ -42,7 +43,7 @@ public:
 		step = 0;
 	};
 	~node(){
-		delete [] this->successor;
+		delete  this->successor;
 	}
 	state getState(){
 	return this->s; 
@@ -57,6 +58,9 @@ public:
 	}
 	void setPredecessor(node *p){
 		this->predecessor = p;
+	}
+	node* getPredecessor(){
+		return this->predecessor;
 	}
 	int getStep(){
 	return this->step;
@@ -147,7 +151,7 @@ int main(int argc,char *argv[]){
 	vector<state> expendState;
 	queue<node*> Nodes;
 	node head(initS);
-	node *curr;
+	node *curr = NULL;
 	Nodes.push(&head);
 	existState.push_back(&head);
 	
@@ -166,7 +170,30 @@ int main(int argc,char *argv[]){
 			}
 		}
 	}
-	
+    bool find = false;
+	for(int i = 0; i<existState.size();i++){
+		if(existState[i]->getState()==golS&&golS.first>0&&golS.second>0){
+			curr = existState[i];
+			find = true;
+		}
+		else if(existState[i]->getState().first==golS.first&&golS.second<0){
+		    curr = existState[i];
+			find = true;
+		}
+		else if(existState[i]->getState().second==golS.second&&golS.first<0){
+		    curr = existState[i];
+			find = true;
+		}
+	}
+	if(!find){
+	cout<<"Cant find Goal State"<<endl;
+	}
+	else{
+		while(curr){
+			cout<<"("<<curr->getState().first<<","<<curr->getState().second<<")"<<endl;
+			curr = curr->getPredecessor();
+		}
+	}
 
 infile.close();
 fclose (stdout);
