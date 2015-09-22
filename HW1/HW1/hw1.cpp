@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <vector>
 #include <queue>
+#include <stack>
 #pragma warning(disable:4996)
 
 using namespace std;
@@ -17,12 +18,19 @@ class edge{
 private:
 	node *org;
 	node *dest;
-	
+	int rule;
 	
 public:
 	edge(){
 	org=NULL;
 	dest=NULL;
+	int rule = 0;
+	}
+	void setRule(int r){
+		this->rule = r;
+	};
+	int getRule(int r){
+		return this->rule;
 	}
 	
 	friend class node;
@@ -48,10 +56,11 @@ public:
 	state getState(){
 	return this->s; 
 	}
-	void addedge(node *dest){
+	void addedge(node *dest,int r){
 	edge e ;
 	e.org = this;
 	e.dest = dest;
+	e.rule = r;
 	
 	this->successor->push_back(e);
 	dest->setPredecessor(this);
@@ -68,6 +77,7 @@ public:
 	void setStep(int x){
 		this->step = x;
 	}
+	
 };
 
 vector<int> applicableRule(state s,int a,int b);
@@ -75,6 +85,7 @@ state applyRuleS1(vector<int> rules,int a,int b,state in);
 vector<state> applyRuleS2(vector<int> rules,int a,int b,state in);
 bool unique(state s,vector<node*> nodes);
 
+void printRes(stack<node*> ms);
 
 int main(int argc,char *argv[]){
 
@@ -166,23 +177,27 @@ int main(int argc,char *argv[]){
 			temp =new node(expendState[i]);
 			Nodes.push(temp);
 			existState.push_back(temp);
-			curr->addedge(temp);
+			curr->addedge(temp,rules[i]);
 			}
 		}
 	}
     bool find = false;
+	stack<node*> ms;
 	for(int i = 0; i<existState.size();i++){
-		if(existState[i]->getState()==golS&&golS.first>0&&golS.second>0){
+		if(existState[i]->getState()==golS&&golS.first>=0&&golS.second>=0){
 			curr = existState[i];
 			find = true;
+			break;
 		}
-		else if(existState[i]->getState().first==golS.first&&golS.second<0){
+		else if(existState[i]->getState().first==golS.first&&golS.second<0&&golS.first>=0){
 		    curr = existState[i];
 			find = true;
+			break;
 		}
-		else if(existState[i]->getState().second==golS.second&&golS.first<0){
+		else if(existState[i]->getState().second==golS.second&&golS.first<0&&golS.second>=0){
 		    curr = existState[i];
 			find = true;
+			break;
 		}
 	}
 	if(!find){
@@ -190,7 +205,8 @@ int main(int argc,char *argv[]){
 	}
 	else{
 		while(curr){
-			cout<<"("<<curr->getState().first<<","<<curr->getState().second<<")"<<endl;
+			ms.push(curr);
+			//cout<<"("<<curr->getState().first<<","<<curr->getState().second<<")"<<endl;
 			curr = curr->getPredecessor();
 		}
 	}
@@ -323,4 +339,55 @@ bool unique(state s,vector<node*> nodes){
 	    return false;
 	}
 	return true;
+}
+
+void printRes(stack<node*> ms){
+	node* curr = ms.top();
+	
+	/*int key = curr->
+	switch(key){
+	case 1:
+		out.first=a;
+		out.second=in.second;
+		cout<<"Fill the "<<a<<"-gallon jug\t->state("<<out.first<<","<<out.second<<")"<<endl;
+		break;
+	case 2:
+		out.first=in.first;
+		out.second=b;
+		cout<<"Fill the "<<b<<"-gallon jug\t->state("<<out.first<<","<<out.second<<")"<<endl;
+		break;
+	case 3:
+		out.first=0;
+		out.second=in.second;
+		cout<<"Empty the "<<a<<"-gallon jug\t->state("<<out.first<<","<<out.second<<")"<<endl;
+		break;
+    case 4:
+		out.first=in.first;
+		out.second=0;
+		cout<<"Empty the "<<b<<"-gallon jug\t->state("<<out.first<<","<<out.second<<")"<<endl;
+		break;
+	case 5:
+		out.first = a;
+		out.second = in.second -(a-in.first);
+		cout<<"Pour water from "<<b<<"-gallon jug into "<<a<<"-gallon jug untill full \t->state("<<out.first<<","<<out.second<<")"<<endl;
+		break;
+	case 6:
+		out.first = in.first-(b-in.second);
+		out.second = b;
+		cout<<"Pour water from "<<a<<"-gallon jug into "<<b<<"-gallon jug untill full \t->state("<<out.first<<","<<out.second<<")"<<endl;
+		break;
+    case 7:
+		out.first=in.first+in.second;
+		out.second=0;
+		cout<<"Pour all the water from "<<b<<"-gallon jug into "<<a<<"-gallon jug \t->state("<<out.first<<","<<out.second<<")"<<endl;
+		break;
+    case 8:
+		out.first=0;
+		out.second=in.first+in.second;
+		cout<<"Pour all the water from "<<b<<"-gallon jug into "<<a<<"-gallon jug \t->state("<<out.first<<","<<out.second<<")"<<endl;
+		break;
+	}
+	return out;
+
+	*/
 }
