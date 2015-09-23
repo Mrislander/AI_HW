@@ -15,7 +15,7 @@ typedef pair<int,int> state;
 class node;
 
 class edge{
-private:
+public:
 	node *org;
 	node *dest;
 	int rule;
@@ -39,16 +39,16 @@ class node{
 
 private:
 	state s;
-	vector<edge> *successor ;
-    node *predecessor;
-	int step;
+	
+	
 public:
-
+	node *predecessor;
+	vector<edge> *successor ;
 	node(pair<int,int> state){
 		s=state;
 		successor= new vector<edge>();
 		predecessor=NULL;
-		step = 0;
+	
 	};
 	~node(){
 		delete  this->successor;
@@ -62,6 +62,7 @@ public:
 	e.dest = dest;
 	e.rule = r;
 	
+	
 	this->successor->push_back(e);
 	dest->setPredecessor(this);
 	}
@@ -71,12 +72,8 @@ public:
 	node* getPredecessor(){
 		return this->predecessor;
 	}
-	int getStep(){
-	return this->step;
-	}
-	void setStep(int x){
-		this->step = x;
-	}
+	
+	
 	
 };
 
@@ -84,8 +81,7 @@ vector<int> applicableRule(state s,int a,int b);
 state applyRuleS1(vector<int> rules,int a,int b,state in);
 vector<state> applyRuleS2(vector<int> rules,int a,int b,state in);
 bool unique(state s,vector<node*> nodes);
-
-void printRes(stack<node*> ms);
+void printState(node* curr,int a, int b,int rule);
 
 int main(int argc,char *argv[]){
 
@@ -204,10 +200,24 @@ int main(int argc,char *argv[]){
 	cout<<"Cant find Goal State"<<endl;
 	}
 	else{
+	
+		stack<node*> ms;
 		while(curr){
 			ms.push(curr);
-			//cout<<"("<<curr->getState().first<<","<<curr->getState().second<<")"<<endl;
-			curr = curr->getPredecessor();
+			curr=curr->predecessor;
+		}
+		curr = ms.top();
+	    ms.pop();
+		while(!ms.empty()){
+	    node* next = ms.top();
+		for(int i = 0;i<curr->successor->size();i++){
+			if(curr->successor->at(i).dest == next){
+				printState(curr,CA,CB,curr->successor->at(i).rule);
+				cout<<"("<<curr->getState().first<<","<<curr->getState().second<<")----->>"<<"("<<next->getState().first<<","<<next->getState().second<<")"<<endl;
+			}
+		}
+		curr = next;
+		ms.pop();
 		}
 	}
 
@@ -341,53 +351,34 @@ bool unique(state s,vector<node*> nodes){
 	return true;
 }
 
-void printRes(stack<node*> ms){
-	node* curr = ms.top();
-	
-	/*int key = curr->
-	switch(key){
-	case 1:
-		out.first=a;
-		out.second=in.second;
-		cout<<"Fill the "<<a<<"-gallon jug\t->state("<<out.first<<","<<out.second<<")"<<endl;
+
+void printState(node* curr,int a, int b,int rule){
+
+	switch(rule){
+	case 1:		
+		cout<<"Fill the "<<a<<"-gallon jug"<<endl;
 		break;
 	case 2:
-		out.first=in.first;
-		out.second=b;
-		cout<<"Fill the "<<b<<"-gallon jug\t->state("<<out.first<<","<<out.second<<")"<<endl;
+		cout<<"Fill the "<<b<<"-gallon jug"<<endl;
 		break;
 	case 3:
-		out.first=0;
-		out.second=in.second;
-		cout<<"Empty the "<<a<<"-gallon jug\t->state("<<out.first<<","<<out.second<<")"<<endl;
+		cout<<"Empty the "<<a<<"-gallon jug"<<endl;
 		break;
     case 4:
-		out.first=in.first;
-		out.second=0;
-		cout<<"Empty the "<<b<<"-gallon jug\t->state("<<out.first<<","<<out.second<<")"<<endl;
+		cout<<"Empty the "<<b<<"-gallon jug"<<endl;
 		break;
 	case 5:
-		out.first = a;
-		out.second = in.second -(a-in.first);
-		cout<<"Pour water from "<<b<<"-gallon jug into "<<a<<"-gallon jug untill full \t->state("<<out.first<<","<<out.second<<")"<<endl;
+		cout<<"Pour water from "<<b<<"-gallon jug into "<<a<<"-gallon jug untill full"<<endl;
 		break;
 	case 6:
-		out.first = in.first-(b-in.second);
-		out.second = b;
-		cout<<"Pour water from "<<a<<"-gallon jug into "<<b<<"-gallon jug untill full \t->state("<<out.first<<","<<out.second<<")"<<endl;
+		cout<<"Pour water from "<<a<<"-gallon jug into "<<b<<"-gallon jug untill full"<<endl;
 		break;
     case 7:
-		out.first=in.first+in.second;
-		out.second=0;
-		cout<<"Pour all the water from "<<b<<"-gallon jug into "<<a<<"-gallon jug \t->state("<<out.first<<","<<out.second<<")"<<endl;
+		cout<<"Pour all the water from "<<b<<"-gallon jug into "<<a<<"-gallon jug"<<endl;
 		break;
     case 8:
-		out.first=0;
-		out.second=in.first+in.second;
-		cout<<"Pour all the water from "<<b<<"-gallon jug into "<<a<<"-gallon jug \t->state("<<out.first<<","<<out.second<<")"<<endl;
+		cout<<"Pour all the water from "<<b<<"-gallon jug into "<<a<<"-gallon jug"<<endl;
 		break;
 	}
-	return out;
 
-	*/
 }
