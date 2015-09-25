@@ -300,42 +300,42 @@ vector<state> applyRuleS2(vector<int> rules,int a,int b,state in){
 	    if(key==1){
 		out.first=a;
 		out.second=in.second;
-		//cout<<"Fill the "<<a<<"-gallon jug->state("<<out.first<<","<<out.second<<")"<<endl;
+		
 		}
 	    else if(key==2){
 		out.first=in.first;
 		out.second=b;
-		//cout<<"Fill the "<<b<<"-gallon jug->state("<<out.first<<","<<out.second<<")"<<endl;
+		
 		}
 	    else if(key==3){
 		out.first=0;
 		out.second=in.second;
-		//cout<<"Empty the "<<a<<"-gallon jug->state("<<out.first<<","<<out.second<<")"<<endl;
+		
 		}
 		else if(key==4){
 		out.first=in.first;
 		out.second=0;
-		//cout<<"Empty the "<<b<<"-gallon jug->state("<<out.first<<","<<out.second<<")"<<endl;
+		
 		}
 		else if(key==5){
 		out.first = a;
 		out.second = in.second -(a-in.first);
-		//cout<<"Pour water from "<<b<<"-gallon jug into "<<a<<"-gallon jug untill full ->state("<<out.first<<","<<out.second<<")"<<endl;
+		
 		}
 		else if(key==6){
 		out.first = in.first-(b-in.second);
 		out.second = b;
-		//cout<<"Pour water from "<<a<<"-gallon jug into "<<b<<"-gallon jug untill full ->state("<<out.first<<","<<out.second<<")"<<endl;
+		
 		}
 		else if(key==7){
 		out.first=in.first+in.second;
 		out.second=0;
-		//cout<<"Pour all the water from "<<b<<"-gallon jug into "<<a<<"-gallon jug->state("<<out.first<<","<<out.second<<")"<<endl;
+		
 		}
 		else if(key==8){
 		out.first=0;
 		out.second=in.first+in.second;
-		//cout<<"Pour all the water from "<<b<<"-gallon jug into "<<a<<"-gallon jug->state("<<out.first<<","<<out.second<<")"<<endl;
+		
 		}
 		res.push_back(out);
 	}
